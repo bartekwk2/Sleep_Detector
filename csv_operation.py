@@ -26,22 +26,32 @@ def read_csv_with_sampling(path):
         yOut = []
         for i in range(len(z)):
             if z[i] < 0.75:
+
                 prevValX = 0
                 nextValX = 0
                 prevValY = 0
                 nextValY = 0
                 rangeVal = 2
-                if (rangeVal+i) >= len(z):
-                    rangeVal = len(z)-i-1
-                elif (i-rangeVal<0):
-                    rangeVal = i
-                for j in range(1,rangeVal+1):
-                    prevValX +=x[i-j]
-                    nextValX +=x[i+j]
-                    prevValY +=y[i-j]
-                    nextValY +=y[i+j]
-                x[i] = (prevValX+nextValX)/(2*rangeVal)
-                y[i] = (prevValY+nextValY)/(2*rangeVal)
+                
+                if i != 0 :
+                    if (rangeVal+i) >= len(z):
+                        rangeVal = len(z)-i-1
+                    elif (i-rangeVal<0):
+                        rangeVal = i
+                    for j in range(1,rangeVal+1):
+                        prevValX +=x[i-j]
+                        nextValX +=x[i+j]
+                        prevValY +=y[i-j]
+                        nextValY +=y[i+j]
+                    x[i] = (prevValX+nextValX)/(2*rangeVal)
+                    y[i] = (prevValY+nextValY)/(2*rangeVal)
+                else :
+                    for j in range(1,rangeVal+1):
+                        nextValX +=x[i+j]
+                        nextValY +=y[i+j]
+                    x[i] = (nextValX)/(rangeVal)
+                    y[i] = (nextValY)/(rangeVal)
+
             if i % 60 == 0:
                 if len(xHelp) != 0:
                     avgX = sum(xHelp) / len(xHelp)

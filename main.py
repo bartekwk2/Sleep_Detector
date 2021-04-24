@@ -11,18 +11,24 @@ import os
 from face_detectors import face_detection1, face_detection2, face_detection2,face_detection_when_partially_hidden
 from csv_operation import read_csv_with_sampling, read_csv
 from video_operation import cutAndScaleVideo,scaleImage
-from speed_calculation import calc_speed,plot_motion,treshhold_motion,draw_treshhold_line,Average,speed_from_csv
+from speed_calculation import calc_speed,plot_motion,treshhold_motion,draw_treshhold_line,Average,speed_from_csv,speed_all_from_csv
 from eye_detecion import detect_eye
+
 
 
 directory = os.getcwd()
 
+timesAboveLAnkle,valuesAboveLAnkle = speed_all_from_csv('LAnkle',30,2,2,1)
+timesAboveRAnkle,valuesAboveRAnkle = speed_all_from_csv('RAnkle',30,2,2,2)
+timesAboveLWrist,valuesAboveLWrist = speed_all_from_csv('LWrist',30,2,2,3)
+timesAboveRWrist,valuesAboveRWrist = speed_all_from_csv('RWrist',30,2,2,4)
 
-#Proba
+plt.show()
 
-detect_eye('/data/points/film1_points/LEye.csv', '/data/points/film1_points/REye.csv', '/data/films/film_1.mp4')
+timesAll = [timesAboveLAnkle,timesAboveRAnkle,timesAboveLWrist,timesAboveRWrist]
+valuesAll = [valuesAboveLAnkle,valuesAboveRAnkle,valuesAboveLWrist,valuesAboveRWrist]
 
-
+detect_eye('/data/points/film1_points/LEye.csv', '/data/points/film1_points/REye.csv', '/data/films/film_1.mp4',timesAll,valuesAll)
 
 '''
 #Detekcja twarzy
@@ -32,9 +38,6 @@ face_detection3("camera",directory+"/data/predictors/haarcascade_eye_tree_eyegla
 
 #Przycięcie i wykadrowanie video
 cutAndScaleVideo(directory+'/data/films/cut_film_1.mp4',0,10, 400, 800)
-
-#Prędkość z plików CSV
-speed_from_csv('LAnkle')
 
 #Wyświetlanie punktów csv na video
 capture = cv2.VideoCapture(directory+'/data/films/film_1.mp4')
@@ -58,6 +61,5 @@ while iterator < framesCount:
 
 
 #Kadrowanie twarzy punktami CSV części ciała i próba predictora do wykrycia punktów oczu
-
 face_detection_when_partially_hidden()
 '''

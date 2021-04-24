@@ -8,12 +8,33 @@ from scipy import ndimage
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 import numpy as np
 import os
+import math
 from csv_operation import read_csv_with_sampling
 
+def speed_all_from_csv(name,treshhold,rows,columns,index):
 
-def speed_from_csv(name):
+        directory = os.getcwd()
+        x,y,z,xOut,yOut= read_csv_with_sampling(directory+'/data/points/film1_points/'+name+'.csv')
+        distance = []
+        length = len(xOut)
+
+        for i in range(length):
+            if i < length-1:
+                distance.append(math.hypot(xOut[i+1]-xOut[i],yOut[i+1]-yOut[i]))
+
+        time,value = treshhold_motion(distance,treshhold)
+        secV = list(range(0,length-1))
+
+        plt.subplot(rows, columns, index)
+        draw_treshhold_line(treshhold,False)
+        plot_motion(list=distance,range=secV,name = name)
+
+        return time,value
+
+def speed_from_csv(name,treshhold):
     directory = os.getcwd()
     x,y,z,xOut,yOut= read_csv_with_sampling(directory+'/data/points/film1_points/'+name+'.csv')
+
     Vx = calc_speed(xOut)
     Vy = calc_speed(yOut)
 
@@ -24,7 +45,6 @@ def speed_from_csv(name):
     secVx = list(range(0, len(Vx)))
     secVy = list(range(0, len(Vy)))
 
-    treshhold = 30
     timeVx,valueVx = treshhold_motion(Vx, treshhold)
     timeVy,valueVy = treshhold_motion(Vy, treshhold)
     print("WARTOŚCI X")
@@ -35,13 +55,14 @@ def speed_from_csv(name):
     print(timeVy)
 
     plt.subplot(2, 1, 1)
-    draw_treshhold_line(treshhold)
+    draw_treshhold_line(treshhold,True)
     plot_motion(list=Vx,range=secVx,name = name + " x")
 
     plt.subplot(2, 1, 2)
-    draw_treshhold_line(treshhold)
+    draw_treshhold_line(treshhold,True)
     plot_motion(list=Vy,range=secVy,name= name + " y")
     plt.show()
+
 
 def calc_speed(dist):
     vOut = []
@@ -63,16 +84,16 @@ def plot_motion(list,range,name):
 def treshhold_motion(listSpeed,treshhold):
     time =  []
     value = []
-
     for i in range(len(listSpeed)):
         if listSpeed[i]>treshhold or listSpeed[i]<-treshhold :
             time.append(i)
             value.append(listSpeed[i])
     return time,value
 
-def draw_treshhold_line(treshhold):
+def draw_treshhold_line(treshhold,multiple):
     plt.axhline(y=treshhold, color='r', linestyle='-')
-    plt.axhline(y=-treshhold, color='r', linestyle='-')
+    if multiple:
+        plt.axhline(y=-treshhold, color='r', linestyle='-')
 
 def Average(lst):
     return sum(lst) / len(lst)

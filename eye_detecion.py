@@ -12,7 +12,14 @@ from video_operation import scaleImage
 
 
 
-def detect_eye(pathLEye,pathREye,pathFilm):
+def detect_eye(pathLEye,pathREye,pathFilm,timesAbove,valuesAbove):
+
+    print(timesAbove)
+
+    lAnkleCount = 0
+    rAnkleCount = 0
+    lWristCount = 0
+    rWristCount = 0
 
     directory = os.getcwd()
 
@@ -22,11 +29,14 @@ def detect_eye(pathLEye,pathREye,pathFilm):
     constAddingX = 40
     constAddingY = 20
     smallAdding = 15
+    valuesPerSec = []
 
     capture = cv2.VideoCapture(directory+pathFilm)
     fps = capture.get(cv2.CAP_PROP_FPS)
     framesCount = len(xLeftEye)
+
     iterator = 0
+    seconds = 0
 
     while iterator < framesCount:
         _, frame = capture.read()
@@ -54,9 +64,23 @@ def detect_eye(pathLEye,pathREye,pathFilm):
         dilate = cv2.morphologyEx(thresh, cv2.MORPH_DILATE, kernel)
 
         diff = cv2.absdiff(dilate, thresh)
-
         howMany = np.where(diff>0)[0]
-        print(howMany.size)
+        #print(howMany.size)
+
+        valuesPerSec.append(howMany.size)
+        if iterator % 60 == 0 :
+            print(("--------- SEKUNDA {sec} ---------").format(sec = seconds))
+            countsOpenPerSec = Average(valuesPerSec)
+
+            if countsOpenPerSec > 0 :
+                print("OCZY OTWARTE "+ str(countsOpenPerSec))
+
+            for i in range(len(timesAbove)):
+                if seconds in timesAbove[i] :
+                    print("RUCH "+decideBodyPart(i,lAnkleCount,rAnkleCount,lWristCount,rWristCount,valuesAbove))
+
+            valuesPerSec.clear()
+            seconds += 1
 
         # img = left_eye
         # img = cv2.medianBlur(img,5)
@@ -64,6 +88,8 @@ def detect_eye(pathLEye,pathREye,pathFilm):
         # circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,1,20,
         #                             param1=50,param2=30,minRadius=0,maxRadius=0)
         # print(circles)
+
+        frameScaled = scaleImage(frame,0.5)
 
         iterator+=1
         cv2.namedWindow('Video1')
@@ -73,6 +99,35 @@ def detect_eye(pathLEye,pathREye,pathFilm):
         cv2.namedWindow('Video2')
         cv2.moveWindow('Video2', 540,230)
         cv2.imshow('Video2', diff)
+
+        cv2.namedWindow('Video3')
+        cv2.moveWindow('Video3', 980,230)
+        cv2.imshow('Video3', frameScaled)
         
         if cv2.waitKey(int(1000/fps)) & 0xFF == ord('q'):
             break
+
+def Average(lst):
+    return sum(lst) / len(lst)
+
+def decideBodyPart(index,lAnkleCount,rAnkleCount,lWristCount,rWristCount,valuesAbove):
+    title = ''
+
+    if index == 0 :
+        title = 'LAnkle '
+        title+=str(valuesAbove[index][lAnkleCount])
+        lAnkleCount+=1
+    elif index == 1 :
+        title = 'RAnkle '
+        title+=str(valuesAbove[index][rAnkleCount])
+        rAnkleCount+=1
+    elif index == 2 :
+        title = 'LWrist '
+        title+=str(valuesAbove[index][lWristCount])
+        lWristCount+=1
+    else:
+        title = "RWrist "
+        title+=str(valuesAbove[index][rWristCount])
+        rWristCount+=1
+
+    return title
