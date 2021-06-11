@@ -9,27 +9,43 @@ import numpy as np
 import os
 
 from face_detectors import face_detection1, face_detection2, face_detection2,face_detection_when_partially_hidden
-from csv_operation import read_csv_with_sampling, read_csv
+from csv_operation import read_csv_with_sampling, read_csv,generate_labels,write_csv
 from video_operation import cutAndScaleVideo,scaleImage
 from speed_calculation import calc_speed,plot_motion,treshhold_motion,draw_treshhold_line,Average,speed_from_csv,speed_all_from_csv
 from eye_detecion import detect_eye
 
 
 
-directory = os.getcwd()
 
+
+
+
+
+counts_open = detect_eye('/data/points/film3_points/LEye.csv', '/data/points/film3_points/REye.csv', '/data/films/film_3.mp4',False)
+print(counts_open)
+write_csv(counts_open,'dziecko')
+
+
+
+#speed_from_csv("LAnkle",30)
+
+
+
+'''
+directory = os.getcwd()
 timesAboveLAnkle,valuesAboveLAnkle = speed_all_from_csv('LAnkle',30,2,2,1)
 timesAboveRAnkle,valuesAboveRAnkle = speed_all_from_csv('RAnkle',30,2,2,2)
 timesAboveLWrist,valuesAboveLWrist = speed_all_from_csv('LWrist',30,2,2,3)
 timesAboveRWrist,valuesAboveRWrist = speed_all_from_csv('RWrist',30,2,2,4)
-
 plt.show()
 
 timesAll = [timesAboveLAnkle,timesAboveRAnkle,timesAboveLWrist,timesAboveRWrist]
 valuesAll = [valuesAboveLAnkle,valuesAboveRAnkle,valuesAboveLWrist,valuesAboveRWrist]
 
-detect_eye('/data/points/film1_points/LEye.csv', '/data/points/film1_points/REye.csv', '/data/films/film_1.mp4',timesAll,valuesAll)
+eyeCounts = detect_eye('/data/points/film1_points/LEye.csv', '/data/points/film1_points/REye.csv', '/data/films/film_1.mp4',timesAll,valuesAll,True)
 
+print(eyeCounts)
+'''
 '''
 #Detekcja twarzy
 face_detection1("camera")

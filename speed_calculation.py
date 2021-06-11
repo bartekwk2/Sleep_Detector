@@ -9,7 +9,46 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 import numpy as np
 import os
 import math
-from csv_operation import read_csv_with_sampling
+from csv_operation import read_csv_with_sampling,read_csv2,generate_labels,split_data
+import matplotlib.pyplot as plt
+
+
+
+def max_speed_for_second(dir):
+    maxPerSecond = []
+    maxPerSecondIndex = []
+    allPartsSpeed,length = speed_body_parts(dir)
+
+    for i in range(length-1):
+        currentMax = 0
+        currentIndexMax = 0
+
+        for indexPart,part in enumerate(allPartsSpeed):
+            if part[i]>=currentMax:
+                currentMax = part[i]
+                currentIndexMax = indexPart
+        maxPerSecond.append(currentMax)
+        maxPerSecondIndex.append(currentIndexMax)
+
+    return maxPerSecond
+
+
+def speed_body_parts(dir):
+    bodyParts = ['LAnkle','RAnkle','LWrist','RWrist']
+    allPartsSpeed = []
+
+    for part in bodyParts:
+        directory = os.getcwd()
+        x,y,z,xOut,yOut= read_csv_with_sampling(directory+'/data/points/'+dir+'/'+part+'.csv')
+        length = len(xOut)
+        distance = []
+
+        for i in range(length):
+            if i < length-1:
+                distance.append(math.hypot(xOut[i+1]-xOut[i],yOut[i+1]-yOut[i]))
+        allPartsSpeed.append(distance)
+
+    return allPartsSpeed,length
 
 def speed_all_from_csv(name,treshhold,rows,columns,index):
 
@@ -97,3 +136,19 @@ def draw_treshhold_line(treshhold,multiple):
 
 def Average(lst):
     return sum(lst) / len(lst)
+
+
+def plotValues(speed,eyeCount):
+    plt.scatter(speed, eyeCount)
+    plt.show()
+
+def plotTwoSeriesValues(xSleepData,ySleepData,xAwakeData,yAwakeData):
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+
+    ax1.scatter(xAwakeData,yAwakeData, s=10, c='r', marker="o", label='second')
+    ax1.scatter(xSleepData, ySleepData, s=10, c='b', marker="s", label='first')
+    plt.show()
+
+
+

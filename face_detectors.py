@@ -164,7 +164,7 @@ def face_detection2(filename,predictor):
     if filename == 'camera':
         cam = cv2.VideoCapture(0)
     else:
-        cam = cv2.VideoCapture(source)
+        cam = cv2.VideoCapture(filename)
 
     escape = 27
     detector = dlib.get_frontal_face_detector()
@@ -198,7 +198,7 @@ def face_detection3(filename,cascadeSource,scaleFactor = 1.1):
     if filename == 'camera':
         cam = cv2.VideoCapture(0)
     else:
-        cam = cv2.VideoCapture(source)
+        cam = cv2.VideoCapture(filename)
 
     escape = 27
 

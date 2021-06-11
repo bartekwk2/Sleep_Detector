@@ -43,6 +43,8 @@ def read_csv_with_sampling(path):
                         nextValX +=x[i+j]
                         prevValY +=y[i-j]
                         nextValY +=y[i+j]
+                    if rangeVal == 0:
+                        rangeVal =1
                     x[i] = (prevValX+nextValX)/(2*rangeVal)
                     y[i] = (prevValY+nextValY)/(2*rangeVal)
                 else :
@@ -78,4 +80,39 @@ def read_csv(path):
             y.append(float(splited[1]))
             conf.append(float(splited[2]))
         return x,y,conf
+
+def read_csv2(path):
+    with open(path, newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter =' ')
+        values = []
+        for row in reader:
+            values.append(float(row[0]))
+    return values
+
+
+def write_csv(dataToSave,name):
+    with open(f'{name}.csv',mode='w',newline='') as f:
+        for item in dataToSave:
+            f.write("%s\n" % item)
+
+
+def generate_labels(arraySize):
+    labelsArray = [0] * arraySize
+    labelsArray[150:160] = [1] * 10
+    labelsArray[214:252] = [1] * 38
+    labelsArray[401:461] = [1] * 60
+    labelsArray[558:570] = [1] * 12
+    labelsArray[573:595] = [1] * 22
+    return labelsArray
+
+
+def split_data(allArrayIndexed,allArrayData):
+    sleepData = []
+
+    for i,val in enumerate(allArrayIndexed):
+        if(val == 1):
+            item = allArrayData[i]
+            sleepData.append(item)
+
+    return allArrayData,sleepData
 
